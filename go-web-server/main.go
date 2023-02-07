@@ -27,6 +27,7 @@ func main () {
 	router.GET("/albums", getAlbums)
 	router.POST("/albums", postAlbums)
 	router.GET("/albums/:id", getAlbumById)
+	
 	router.Run("localhost:8082")
 }
 
