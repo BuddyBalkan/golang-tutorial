@@ -3,6 +3,8 @@ package main
 import(
 	"fmt"
 	"os"
+	"log"
+	"net/http"
 )
 
 
@@ -38,8 +40,18 @@ func loadPage(title string) (*Page, error){
 }
 
 func main() {
-	page1 := &Page{Title: "Test Page 1", Body: []byte("<h1> this is a Test Page 1. </h1>")}
-	page1.save()
-	page2, _ := loadPage("Test Page 1")
-	fmt.Println(string(page2.Body))
+	// page1 := &Page{Title: "Test_Page_1", Body: []byte("<h1> this is a Test Page 1. </h1>")}
+	// page1.save()
+	// page2, _ := loadPage("Test_Page_1")
+	// fmt.Println(string(page2.Body))
+
+	http.HandleFunc("/view/", viewHandler)
+	log.Fatal(http.ListenAndServe(":8082", nil))
+}
+
+// 处理“/view"路径的逻辑 
+func viewHandler(w http.ResponseWriter, r *http.Request){
+	title := r.URL.Path[len("/view/"):]
+	p, _ := loadPage(title)
+	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", p.Title, p.Body)
 }
