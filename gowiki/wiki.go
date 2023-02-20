@@ -104,16 +104,33 @@ func editHandler(w http.ResponseWriter, r *http.Request){
 	rederTemplate(w, "edit", p)
 }
 
+// 对相同的代码逻辑做封装方法处理解析html文件并展示 并处理可能出现的error与返回给用户可识别的错误内容
 func rederTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-	t, _ := template.ParseFiles(tmpl + ".html")
-	t.Execute(w, p)
+	// t, _ := template.ParseFiles(tmpl + ".html")
+	// t.Execute(w, p)
+	// handle the error
+	t, err := template.ParseFiles(tmpl + ".html")
+	if err != nil{
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = t.Execute(w, p)
+	if err != nil {
+		http.Error(w, err.Error, http.StatusInternalServerError)
+	}
 }
 
+// 
 func saveHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/save/"):]
 	body := r.FormValue("body")  // the body is string type
 	p := &Page{Title: tilte, Body: []byte(body)}
-	p.save()
-
+	err := p.save()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	http.Redirect(w, r, "/view/" + title, http.StatusFound)
 }
+
