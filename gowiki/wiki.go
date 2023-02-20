@@ -49,17 +49,33 @@ func main() {
 
 	http.HandleFunc("/view/", viewHandler)
 	http.HandleFunc("/edit/", editHandler)
-	// http.HandleFunc("/save/", saveHandler)
+	http.HandleFunc("/save/", saveHandler)
 	log.Fatal(http.ListenAndServe(":8082", nil))
 }
 
 // 处理“/view"路径的逻辑 
-func viewHandler(w http.ResponseWriter, r *http.Request){
-	title := r.URL.Path[len("/view/"):]
-	p, _ := loadPage(title)
-	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", p.Title, p.Body)
-}
+// func viewHandler(w http.ResponseWriter, r *http.Request){
+// 	title := r.URL.Path[len("/view/"):]
+// 	p, _ := loadPage(title)
+// 	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", p.Title, p.Body)
+// }
 
+// 处理“/view”路径的逻辑 使用template的模板引擎
+func viewHandler(w http.ResponseWriter, r *http.Request){
+	title := r.URL.Path[len("/view/"): ]
+
+ 	p, err := loadPage(title)
+ 	// 若请求了一个不存在的页面 则重定向至编辑页面供用户编辑（wiki功能）
+ 	if err != nil{ 
+ 		http.Redirect(w, r, "/edit/" + title, http.StatusFound) // http status code is 302
+ 		return
+ 	}
+
+ 	// t, _ := template.ParseFiles("view.html")
+
+ 	// t.Execute(w, p)
+ 	rederTemplate(w, "view", p)
+}
 // 处理“/edit"路径的逻辑 硬编码（hard-coded）的html
 // func editHandler(w http.ResponseWriter, r *http.Request){
 // 	title := r.URL.Path[len("/edit/"):]
@@ -88,19 +104,16 @@ func editHandler(w http.ResponseWriter, r *http.Request){
 	rederTemplate(w, "edit", p)
 }
 
-// 处理“/view”路径的逻辑 使用template的模板引擎
-func viewHandler(w http.ResponseWriter, r *http.Request){
-	title := r.URL.Path[len("/view/"): ]
-
- 	p, _ := loadPage(title)
-
- 	// t, _ := template.ParseFiles("view.html")
-
- 	// t.Execute(w, p)
- 	rederTemplate(w, "view", p)
-}
-
 func rederTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 	t, _ := template.ParseFiles(tmpl + ".html")
 	t.Execute(w, p)
+}
+
+func saveHandler(w http.ResponseWriter, r *http.Request) {
+	title := r.URL.Path[len("/save/"):]
+	body := r.FormValue("body")  // the body is string type
+	p := &Page{Title: tilte, Body: []byte(body)}
+	p.save()
+
+	http.Redirect(w, r, "/view/" + title, http.StatusFound)
 }
