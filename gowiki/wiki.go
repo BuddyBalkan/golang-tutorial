@@ -83,8 +83,9 @@ func editHandler(w http.ResponseWriter, r *http.Request){
 		p = &Page{Title: title}
 	}
 
-	t, _ := template.ParseFiles("edit.html")
-	t.Execute(w, p)
+	// t, _ := template.ParseFiles("edit.html")
+	// t.Execute(w, p)
+	rederTemplate(w, "edit", p)
 }
 
 // 处理“/view”路径的逻辑 使用template的模板引擎
@@ -92,12 +93,14 @@ func viewHandler(w http.ResponseWriter, r *http.Request){
 	title := r.URL.Path[len("/view/"): ]
 
  	p, _ := loadPage(title)
- 	t, _ := template.ParseFiles("view.html")
 
- 	t.Execute(w, p)
+ 	// t, _ := template.ParseFiles("view.html")
+
+ 	// t.Execute(w, p)
+ 	rederTemplate(w, "view", p)
 }
 
-// func rederTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-// 	t, _ := template.ParseFiles(tmpl + ".html")
-// 	t.Execute(w, p)
-// }
+func rederTemplate(w http.ResponseWriter, tmpl string, p *Page) {
+	t, _ := template.ParseFiles(tmpl + ".html")
+	t.Execute(w, p)
+}
