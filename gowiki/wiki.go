@@ -1,6 +1,7 @@
 package main
 
 import(
+	"html/template"
 	"fmt"
 	"os"
 	"log"
@@ -60,16 +61,43 @@ func viewHandler(w http.ResponseWriter, r *http.Request){
 }
 
 // 处理“/edit"路径的逻辑 硬编码（hard-coded）的html
+// func editHandler(w http.ResponseWriter, r *http.Request){
+// 	title := r.URL.Path[len("/edit/"):]
+// 	p, err := loadPage(title)
+// 	if err != nil {
+// 		p := &Page{Title: title}
+// 	}
+// 	fmt.Fprintf(w, "<h1>Editing %s</h1>" + 
+// 		"<form action=\"/save/%s\" method=\"POST\">" + 
+// 		"<textarea name=\"body\"> %s </textarea><br>" + 
+// 		"<input type=\"submit\" value=\"Save\">" + 
+// 		"</form>",
+// 		p.Title, p.Title, p.Body)
+// }
+
+// 处理“/edit”路径的逻辑 使用template的模板引擎的html （前后端不分离）
 func editHandler(w http.ResponseWriter, r *http.Request){
 	title := r.URL.Path[len("/edit/"):]
 	p, err := loadPage(title)
 	if err != nil {
-		p := &Page{Title: title}
+		p = &Page{Title: title}
 	}
-	fmt.Fprintf(w, "<h1>Editing %s</h1>" + 
-		"<form action=\"/save/%s\" method=\"POST\">" + 
-		"<textarea name=\"body\"> %s </textarea><br>" + 
-		"<input type=\"submit\" value=\"Save\">" + 
-		"</form>",
-		p.Title, p.Title, p.Body)
+
+	t, _ := template.ParseFiles("edit.html")
+	t.Execute(w, p)
 }
+
+// 处理“/view”路径的逻辑 使用template的模板引擎
+func viewHandler(w http.ResponseWriter, r *http.Request){
+	title := r.URL.Path[len("/view/"): ]
+
+ 	p, _ := loadPage(title)
+ 	t, _ := template.ParseFiles("view.html")
+
+ 	t.Execute(w, p)
+}
+
+// func rederTemplate(w http.ResponseWriter, tmpl string, p *Page) {
+// 	t, _ := template.ParseFiles(tmpl + ".html")
+// 	t.Execute(w, p)
+// }
