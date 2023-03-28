@@ -69,3 +69,14 @@ func TestReflectAppendSlice(t *testing.T) {
 	fmt.Printf("the result is %+v \n", targetMap)
 
 }
+
+func TestParseData2Map(t *testing.T) {
+	dataIntSlice := []string{"1;3;5;7;9;11", "2;4;6;8;10"}
+	ids := []int{1, 2}
+	targetMap := make(map[int]*sliceTest)
+	ParseData2Map(dataIntSlice, ids, targetMap)
+	//fmt.Printf("the result is %+v \n", targetMap)
+	for i, result := range targetMap {
+		fmt.Printf("the key is : %v , and the value is : %+v; \n", i, result)
+	}
+}
