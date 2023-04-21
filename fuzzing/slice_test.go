@@ -2,16 +2,37 @@ package main
 
 import (
 	"fmt"
+	"github.com/mitchellh/mapstructure"
 	"reflect"
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 )
 
 type sliceTest struct {
 	Id       int
 	IntSlice []int
 	Name     string
+}
+
+type MapEntity struct {
+	FoodNum     int
+	Probability int
+}
+
+func (m *MapEntity) Str2Init(str string) {
+	// str -> FoodNum=xx,Probability=yy
+	fieldsStr := strings.Split(str, ",")
+	theMap := make(map[string]int, 2)
+	for _, s := range fieldsStr {
+		// fieldsStr[0] -> FoodNum=xx
+		// fieldsStr[1] -> Probability=yy
+		sList := strings.Split(s, "=")
+		value, _ := strconv.Atoi(sList[1])
+		theMap[sList[0]] = value
+	}
+	_ = mapstructure.Decode(theMap, m)
 }
 
 func TestAppendIntSlice(t *testing.T) {
@@ -79,4 +100,39 @@ func TestParseData2Map(t *testing.T) {
 	for i, result := range targetMap {
 		fmt.Printf("the key is : %v , and the value is : %+v; \n", i, result)
 	}
+}
+
+func TestFloat32ToStr(t *testing.T) {
+	a := float32(3.79)
+	t.Logf("the duration result is %v", fmt.Sprint(a, "s"))
+	aDuration, _ := time.ParseDuration(fmt.Sprint(a, "s"))
+	t.Logf("the a result in millisecond is %v", aDuration.Milliseconds())
+}
+
+func TestStr2Init(t *testing.T) {
+	tarString := "FoodNum=9,Probability=1"
+	tarConfig := &MapEntity{}
+	tarConfig.Str2Init(tarString)
+	t.Logf("the config result is : %+v", tarConfig)
+}
+
+func TestWeightedChoiceMap(t *testing.T) {
+	m := make(map[int]int, 3)
+	m[7] = 1
+	m[8] = 2
+	m[9] = 3
+
+	m2 := make(map[int]int, 4)
+	m2[1] = 7
+	m2[2] = 9
+	m2[3] = 8
+	m2[4] = 10
+
+	for i := 0; i < 10; i++ {
+		t.Logf("the result of m is : %v", WeightedChoiceMap(m))
+	}
+	for i := 0; i < 10; i++ {
+		t.Logf("the result of m2 is : %v", WeightedChoiceMap(m2))
+	}
+
 }

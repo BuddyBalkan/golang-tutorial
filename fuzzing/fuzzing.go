@@ -3,6 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math"
+	"math/rand"
 	"reflect"
 	"strconv"
 	"strings"
@@ -79,4 +81,31 @@ func ParseData2Map(dataSlice []string, ids []int, targetMap interface{}) {
 			dataMapValue.Set(reflect.AppendSlice(dataMapValue, singleTarget))
 		}
 	}
+}
+
+// 依据权重返回数字 key为具体的数据 value为该数据对应的权重
+func WeightedChoiceMap(weightMap map[int]int) int {
+	probSum := int32(0)
+	ks := make([]int, 0)
+	vs := make([]int, 0)
+	for k, v := range weightMap {
+		ks = append(ks, k)
+		vs = append(vs, v)
+		probSum += int32(v)
+	}
+	random := int(rand.Int31n(probSum))
+	temp := 0
+	for i, v := range vs {
+		temp += v
+		if random < temp {
+			return ks[i]
+		}
+	}
+	return -1
+}
+
+// 四舍五入
+func RoundUpFloat(num float64) int32 {
+	return int32(math.Floor(num + 0.5)) // 向下取整
+	//return int32(math.Ceil(num - 0.5)) // 向上取整
 }

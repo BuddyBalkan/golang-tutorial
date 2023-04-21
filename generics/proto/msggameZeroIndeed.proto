@@ -1,0 +1,33 @@
+syntax = "proto3";
+package generics;
+option go_package ="./msggameNoZero";
+//option go_package ="./msggame";
+
+// 工程师游戏 棋盘节点
+message Point
+{
+  optional int32 XLocation = 1;
+  optional int32 YLocation = 2;
+}
+
+// 工程师游戏 棋盘链路
+message ConnectionPath
+{
+  TerminalPair Pair = 1;
+  repeated Point Path = 2;
+}
+
+// 工程师游戏 棋盘上的一对点
+message TerminalPair
+{
+  Point PointA = 1;
+  Point PointB = 2;
+}
+
+// 工程师游戏棋盘问题结构
+message ConnectionQuestion
+{
+  int32 SideTileCount = 1;
+  repeated TerminalPair TerminalPairList = 2;
+  repeated Point CrossLocations = 3;
+}
